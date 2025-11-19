@@ -314,6 +314,11 @@ async function updateFromJSON(jsonPath) {
   console.log(`Version: ${jsonData.version}`);
   console.log(`Prompts count: ${jsonData.prompts.length}`);
 
+  // Count version files in the same directory as the input JSON
+  const jsonDir = dirname(jsonPath);
+  const versionFiles = readdirSync(jsonDir).filter(f => f.match(/^prompts-[\d.]+\.json$/));
+  const versionCount = versionFiles.length;
+
   // Get existing token counts from README
   const existingTokenCounts = parseReadmeTokenCounts();
 
@@ -394,7 +399,7 @@ async function updateFromJSON(jsonPath) {
 
   // Update README
   console.log('\x1b[34mUpdating README.md...\x1b[0m');
-  updateReadme(promptsByFilename, jsonData.version, releaseDate);
+  updateReadme(promptsByFilename, jsonData.version, releaseDate, versionCount);
 
   console.log('\x1b[32;1mUpdate complete!\x1b[0m');
   console.log(`   New: \x1b[1m${newPrompts.size}\x1b[0m`);
@@ -405,14 +410,15 @@ async function updateFromJSON(jsonPath) {
 /**
  * Update README.md with new prompt information
  */
-function updateReadme(promptsByFilename, version, releaseDate) {
+function updateReadme(promptsByFilename, version, releaseDate, versionCount) {
   let readme = readFileSync(README_PATH, 'utf-8');
   const lines = readme.split('\n');
 
   // Update version in header with npm link and date
   const npmUrl = `https://www.npmjs.com/package/@anthropic-ai/claude-code/v/${version}`;
   const dateStr = releaseDate ? ` (${releaseDate})` : '';
-  lines[2] = `This repository contains an up-to-date list of all Claude Code's various system prompts and their associated token counts as of **[Claude Code v${version}](${npmUrl})${dateStr}.**`;
+
+  lines[2] = `This repository contains an up-to-date list of all Claude Code's various system prompts and their associated token counts as of **[Claude Code v${version}](${npmUrl})${dateStr}.**  It also contains a [**CHANGELOG.md**](./CHANGELOG.md) for the system prompts across ${versionCount} versions since v2.0.14.`;
 
   // Organize prompts by category
   const categories = {
