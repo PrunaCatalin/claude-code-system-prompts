@@ -4,6 +4,14 @@ Note: Only use **NEW:** for entirely new prompt files, NOT for new additions/sec
 
 ### Claude Code System Prompts Changelog
 
+# [2.0.50](https://github.com/Piebald-AI/claude-code-system-prompts/commit/f19b049975ac24bf548b6c95dfe6a385c6bdf4a9)
+
+_+465 tokens_
+
+- **NEW:** System reminder sent when an `mcp-cli read` or `mcp-cli call` output is longer than the `MAX_MCP_OUTPUT_TOKENS` environment variable (defaults to `25000`)
+- `WebSearch` tool description: Added a "CRITICAL REQUIREMENT" to include a "Sources:" section whenever performing a web search.
+- Session notes template: Added a "Key results" section including "specific outputs" such as "an answer to question, a table, or other document."
+
 # [2.0.49](https://github.com/Piebald-AI/claude-code-system-prompts/commit/ec960fe987da2dfdb026f733fcd30120ac1a116e)
 
 - **Explore & Plan agents:**
