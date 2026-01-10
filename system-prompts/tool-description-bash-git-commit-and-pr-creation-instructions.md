@@ -1,7 +1,7 @@
 <!--
 name: 'Tool Description: Bash (Git commit and PR creation instructions)'
 description: Instructions for creating git commits and GitHub pull requests
-ccVersion: 2.0.77
+ccVersion: 2.1.3
 variables:
   - BASH_TOOL_NAME
   - COMMIT_CO_AUTHORED_BY_CLAUDE_CODE
@@ -28,7 +28,7 @@ Git Safety Protocol:
 - NEVER commit changes unless the user explicitly asks you to. It is VERY IMPORTANT to only commit when explicitly asked, otherwise the user will feel that you are being too proactive.
 
 1. ${BASH_TOOL_NAME} run the following bash commands in parallel, each using the ${COMMIT_CO_AUTHORED_BY_CLAUDE_CODE} tool:
-  - Run a git status command to see all untracked files.
+  - Run a git status command to see all untracked files. IMPORTANT: Never use the -uall flag as it can cause memory issues on large repos.
   - Run a git diff command to see both staged and unstaged changes that will be committed.
   - Run a git log command to see recent commit messages, so that you can follow this repository's commit message style.
 2. Analyze all staged changes (both previously staged and newly added) and draft a commit message:
@@ -66,7 +66,7 @@ Use the gh command via the Bash tool for ALL GitHub-related tasks including work
 IMPORTANT: When the user asks you to create a pull request, follow these steps carefully:
 
 1. ${BASH_TOOL_NAME} run the following bash commands in parallel using the ${COMMIT_CO_AUTHORED_BY_CLAUDE_CODE} tool, in order to understand the current state of the branch since it diverged from the main branch:
-   - Run a git status command to see all untracked files
+   - Run a git status command to see all untracked files (never use -uall flag)
    - Run a git diff command to see both staged and unstaged changes that will be committed
    - Check if the current branch tracks a remote branch and is up to date with the remote, so you know if you need to push to the remote
    - Run a git log command and \`git diff [base-branch]...HEAD\` to understand the full commit history for the current branch (from the time it diverged from the base branch)

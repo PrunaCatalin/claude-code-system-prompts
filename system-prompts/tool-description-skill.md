@@ -5,7 +5,6 @@ ccVersion: 2.0.77
 variables:
   - FORMAT_SKILLS_AS_XML_FN
   - LIMITED_COMMANDS
-  - AVAILABLE_SKILLs
 -->
 Execute a skill within the main conversation
 
