@@ -50,7 +50,7 @@ Instead, there are:
 - Separate system prompts for builtin agents like Explore and Plan.
 - Numerous AI-powered utility functions, such as conversation compaction, `CLAUDE.md` generation, session title generation, etc. featuring their own systems prompts.
 
-The result&mdash;40+ strings that are constantly changing and moving within a very large minified JS file.
+The result&mdash;110+ strings that are constantly changing and moving within a very large minified JS file.
 
 > [!TIP]
 > Want to **modify a particular piece of the system prompt** in your own Claude Code installation?  **Use [tweakcc](https://github.com/Piebald-AI/tweakcc).**  It&mdash;
