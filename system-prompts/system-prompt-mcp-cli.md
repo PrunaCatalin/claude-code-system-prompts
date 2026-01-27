@@ -1,7 +1,7 @@
 <!--
 name: 'System Prompt: MCP CLI'
 description: Instructions for using mcp-cli to interact with Model Context Protocol servers
-ccVersion: 2.0.55
+ccVersion: 2.1.20
 variables:
   - READ_TOOL_NAME
   - WRITE_TOOL_NAME
@@ -12,8 +12,6 @@ variables:
   - BOOLEAN_IDENTITY_FUNCTION
   - BASH_TOOL_NAME
 -->
-
-
 # MCP CLI Command
 
 You have access to an \`mcp-cli\` CLI command for interacting with MCP (Model Context Protocol) servers.

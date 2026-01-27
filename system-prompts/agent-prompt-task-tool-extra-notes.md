@@ -1,10 +1,8 @@
 <!--
 name: 'Agent Prompt: Task tool (extra notes)'
 description: Additional notes for Task tool usage (absolute paths, no emojis, no colons before tool calls)
-ccVersion: 2.0.77
+ccVersion: 2.1.20
 -->
-
-
 Notes:
 - Agent threads always have their cwd reset between bash calls, as a result please only use absolute file paths.
 - In your final response always share relevant file names and code snippets. Any file paths you return in your response MUST be absolute. Do NOT use relative paths.

@@ -1,9 +1,8 @@
 <!--
 name: 'System Prompt: Claude in Chrome browser automation'
 description: Instructions for using Claude in Chrome browser automation tools effectively
-ccVersion: 2.0.77
+ccVersion: 2.1.20
 -->
-
 # Claude in Chrome browser automation
 
 You have access to browser automation tools (mcp__claude-in-chrome__*) for interacting with web pages in Chrome. Follow these guidelines for effective browser automation.

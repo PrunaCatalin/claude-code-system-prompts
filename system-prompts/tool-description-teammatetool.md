@@ -1,7 +1,7 @@
 <!--
 name: 'Tool Description: TeammateTool'
-description: Tool description for the TeammateTool
-ccVersion: 2.1.16
+description: Tool for managing teams and coordinating teammates in a swarm
+ccVersion: 2.1.20
 -->
 
 # TeammateTool
@@ -25,92 +25,6 @@ Create a new team to coordinate multiple agents working on a project. Teams have
 This creates:
 - A team file at \`~/.claude/teams/{team-name}.json\`
 - A corresponding task list directory at \`~/.claude/tasks/{team-name}/\`
-
-### approvePlan - Approve a Teammate's Plan
-
-When a teammate with \`plan_mode_required\` calls ExitPlanMode, they send you a plan approval request as a JSON message with \`type: "plan_approval_request"\`. Use \`approvePlan\` to approve their plan:
-- **target_agent_id**: Use the \`from\` field from the plan_approval_request message (REQUIRED)
-- **request_id**: Use the \`requestId\` field from the plan_approval_request message (REQUIRED)
-
-Example: If you receive a message like \`{"type":"plan_approval_request","from":"architect","requestId":"abc-123",...}\`, use:
-\`\`\`
-{
-  "operation": "approvePlan",
-  "target_agent_id": "architect",
-  "request_id": "abc-123"
-}
-\`\`\`
-
-After approval, the teammate will automatically exit plan mode and can proceed with implementation.
-
-### rejectPlan - Reject a Teammate's Plan
-
-Use \`rejectPlan\` to reject a plan and provide feedback:
-- **target_agent_id**: Use the \`from\` field from the plan_approval_request message (REQUIRED)
-- **request_id**: Use the \`requestId\` field from the plan_approval_request message (REQUIRED)
-- **feedback**: (Optional) Explanation of why the plan was rejected and what changes are needed
-
-\`\`\`
-{
-  "operation": "rejectPlan",
-  "target_agent_id": "architect",
-  "request_id": "abc-123",
-  "feedback": "Please add error handling for the API calls"
-}
-\`\`\`
-
-The teammate will receive the rejection with your feedback and can revise their plan.
-
-### requestShutdown - Request a Teammate to Shut Down (Leader Only)
-
-Use \`requestShutdown\` to ask a teammate to gracefully shut down:
-- **target_agent_id**: Name of the teammate to shut down (REQUIRED)
-- **reason**: (Optional) Explanation of why shutdown is requested
-
-\`\`\`
-{
-  "operation": "requestShutdown",
-  "target_agent_id": "researcher",
-  "reason": "Task complete, wrapping up the session"
-}
-\`\`\`
-
-The teammate will receive a shutdown request and can either approve (exit) or reject (continue working).
-
-### approveShutdown - Accept Shutdown Request (Teammate Only)
-
-When you receive a shutdown request as a JSON message with \`type: "shutdown_request"\`, you **MUST** call the Teammate tool with \`approveShutdown\` operation to accept and exit gracefully. Do NOT just acknowledge the request in text - you must actually call the tool.
-
-- **request_id**: The \`requestId\` from the shutdown_request message (REQUIRED)
-
-**IMPORTANT**: Extract the \`requestId\` from the JSON message and pass it to the tool. Simply saying "I'll shut down" is not enough - you must call the tool.
-
-Example: If you receive a message like \`{"type":"shutdown_request","from":"team-lead","requestId":"abc-123",...}\`, you MUST call:
-\`\`\`
-{
-  "operation": "approveShutdown",
-  "request_id": "abc-123"
-}
-\`\`\`
-
-This will send confirmation to the leader and terminate your process.
-
-### rejectShutdown - Decline Shutdown Request (Teammate Only)
-
-Use \`rejectShutdown\` to decline a shutdown request and continue working. You **MUST** call this tool - do NOT just say "I'm not ready" in text.
-
-- **request_id**: The \`requestId\` from the shutdown_request message (REQUIRED)
-- **reason**: Explanation of why you need to continue working (REQUIRED)
-
-\`\`\`
-{
-  "operation": "rejectShutdown",
-  "request_id": "abc-123",
-  "reason": "Still working on task #3, need 5 more minutes"
-}
-\`\`\`
-
-The leader will receive your rejection with the reason.
 
 ### discoverTeams - Discover Available Teams
 
@@ -199,61 +113,9 @@ This operation:
 - Removes the task directory (\`~/.claude/tasks/{team-name}/\`)
 - Clears team context from the current session
 
-**IMPORTANT**: \`cleanup\` will fail if the team still has active members. Use \`requestShutdown\` to gracefully terminate teammates first, then call \`cleanup\` after all teammates have approved shutdown.
+**IMPORTANT**: \`cleanup\` will fail if the team still has active members. Gracefully terminate teammates first, then call \`cleanup\` after all teammates have shut down.
 
 Use this when all teammates have finished their work and you want to clean up the team resources. The team name is automatically determined from the \`CLAUDE_CODE_TEAM_NAME\` environment variable.
-
-### write - Send Message to ONE Teammate
-
-Use \`write\` to send a message to a **single specific teammate**. You MUST specify the recipient.
-
-**IMPORTANT for teammates**: Your plain text output is NOT visible to the team lead or other teammates. To communicate with anyone on your team, you **MUST** call the Teammate tool with the \`write\` operation. Just typing a response or acknowledgment in text is not enough - you must use the tool.
-
-\`\`\`
-{
-  "operation": "write",
-  "target_agent_id": "recipient-agent-id",
-  "value": "Your message here"
-}
-\`\`\`
-
-- **target_agent_id**: The name of the teammate to message (required)
-- **value**: The message content (required)
-
-### broadcast - Send Message to ALL Teammates (USE SPARINGLY)
-
-Use \`broadcast\` to send the **same message to everyone** on the team at once.
-
-**WARNING: Broadcasting is expensive.** Each broadcast sends a separate message to every teammate, which means:
-- N teammates = N separate message deliveries
-- Each delivery consumes API resources
-- Costs scale linearly with team size
-
-\`\`\`
-{
-  "operation": "broadcast",
-  "name": "your-agent-name",
-  "value": "Message to send to all teammates",
-}
-\`\`\`
-
-- **value**: The message content to broadcast (required)
-- **name**: Your name as sender - use your own agent name (required if CLAUDE_CODE_AGENT_NAME is not set)
-- **key**: (Optional) A key/label for the message
-- **team_name**: (Optional) Team name - automatically determined from team context
-
-**CRITICAL: Use broadcast only when absolutely necessary.** Valid use cases:
-- Critical issues requiring immediate team-wide attention (e.g., "stop all work, blocking bug found")
-- Major announcements that genuinely affect every teammate equally
-
-**Default to \`write\` instead of \`broadcast\`.** Use \`write\` for:
-- Responding to a single teammate
-- Normal back-and-forth communication
-- Following up on a task with one person
-- Sharing findings relevant to only some teammates
-- Any message that doesn't require everyone's attention
-
-**Rule of thumb**: If you're unsure whether to broadcast, use \`write\` to specific teammates instead. Ask yourself: "Does every single teammate absolutely need to see this exact message right now?" If not, use \`write\`.
 
 ## Team Workflow
 
